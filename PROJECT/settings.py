@@ -147,6 +147,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #AbstractBaseUser
 AUTH_USER_MODEL = "auth_app.User"
 
+MAX_OTP_TRY = 3
+
+MIN_PASSWORD_LENGTH = 8
+
 #rest_framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
