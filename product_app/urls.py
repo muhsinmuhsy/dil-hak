@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CategoryListCreateAPIView, ProductsWithVariantsListAPIView, ProductWithVariantsListAPIView, CategoryWithProductsAPIView, ColorAPIView, ColorDeleteAPIView, ColorImageAPIView
+from .views import CategoryListCreateAPIView, ProductsWithVariantsListAPIView, ProductWithVariantsListAPIView, CategoryWithProductsAPIView, ColorAPIView, ColorDeleteAPIView, ColorImageAPIView, ProductAndVariantsCreateAPIView
 
 urlpatterns = [
     path('categories/', CategoryListCreateAPIView.as_view(), name='category-list-create'),
@@ -9,4 +9,5 @@ urlpatterns = [
     path('colors/', ColorAPIView.as_view(), name='color'),
     path('color/<int:color_id>/delete/', ColorDeleteAPIView.as_view(), name='color-delete'),
     path('colorimage/<int:colorimage_id>/delete/', ColorImageAPIView.as_view(), name='colorimage-delete'),
+    path('product/variants/create/', ProductAndVariantsCreateAPIView.as_view(), name='product-and-variants-create'),
 ]

@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from .models import Category, Product, ProductVariant, Color, ColorImage
-from .serializers import CategorySerializer,ProductSerializer, ProductVariantListSerializer, ColorImageSerializer, ColorSerializer
+from .serializers import CategorySerializer,ProductSerializer, ProductVariantListSerializer, ColorImageSerializer, ColorSerializer, ProductVariantAddSerializer
 from rest_framework.response import Response
 from rest_framework import status
+from django.db import transaction
 
 class CategoryListCreateAPIView(APIView):
     def get(self, request, format=None):
@@ -195,3 +196,30 @@ class ColorDeleteAPIView(APIView):
         except Exception as e:
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+
+class ProductAndVariantsCreateAPIView(APIView):
+    @transaction.atomic
+    def post(self, request, format=None):
+        product_data = request.data
+        variants_data = product_data.pop('variants', [])
+
+        product_serializer = ProductSerializer(data=product_data)
+        
+        if product_serializer.is_valid():
+            product = product_serializer.save()
+            try:
+                for variant_data in variants_data:
+                    variant_data['product'] = product.id
+                    variant_serializer = ProductVariantAddSerializer(data=variant_data)
+                    
+                    if variant_serializer.is_valid():
+                        variant_serializer.save()
+                    else:
+                        transaction.set_rollback(True)
+                        return Response(variant_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+            
+            return Response(product_serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(product_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
